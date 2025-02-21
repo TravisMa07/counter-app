@@ -21,6 +21,8 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
   constructor() {
     super();
     this.count = 0;
+    this.min = 0;
+    this.max = 50;
     this.title = "";
     this.t = this.t || {};
     this.t = {
@@ -40,7 +42,9 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
   static get properties() {
     return {
       ...super.properties,
-     count: { type: Number, reflect: true },
+    count: { type: Number, reflect: true },
+    min: {type: Number, reflect: true},
+    max: {type: Number, reflect: true},
     };
   }
 
@@ -53,19 +57,48 @@ export class CounterApp extends DDDSuper(I18NMixin(LitElement)) {
         color: var(--ddd-theme-primary);
         background-color: var(--ddd-theme-accent);
         font-family: var(--ddd-font-navigation);
+        padding: 16px;
       }
       
-      :host([count="10"]){
-        color: var(--ddd-theme-default-athertonViolet);
+      :host([count="18"]){
+        color: var(--ddd-theme-default-potentialMidnight);
       }
+      :host([count="21"]){
+        color: var(--ddd-theme-default-skyBlue);
+      }
+
+     
 
       .wrapper {
         margin: var(--ddd-spacing-2);
         padding: var(--ddd-spacing-4);
+        
       }
       
       .counter {
         font-size: var(--counter-app-label-font-size, var(--ddd-font-size-xxl));
+      }
+
+      .maxColor{
+        color: var(--ddd-theme-default-error);
+      }
+
+      .minColor{
+        color: var(--ddd-theme-default-warning);
+      }
+      
+      .buttons{
+        display: flex;
+        gap: 12px;
+        padding: 8px 4px;
+      }
+     
+      .buttons button:hover{
+        background-color: var(--ddd-theme-default-coalyGray);
+      }
+
+      .buttons button:focus{
+        outline: 2px solid var(--ddd-theme-default-roarGolden);
       }
         
     `];
@@ -101,31 +134,42 @@ makeItRain() {
   );
 }
 
+countMinMaxColorChange(){
+  if(this.count === this.min){
+    return "minColor";
+  }
+  if(this.count === this.max){
+    return "maxColor";
+  }
+  return "";
+}
+
   
   // Lit render the HTML
   render() {
     return html`
 <confetti-container id="confetti" class="wrapper"> 
-  <div class="counter">${this.count}</div>
+  <div class="counter ${this.countMinMaxColorChange()}">${this.count}</div>
     <div class="buttons">
-      <button @click="${this.decrease}">-1</button>
-      <button @click="${this.increase}">+1</button>
+    <button @click="${this.decrease}" ?disabled="${this.count === this.min}">-1</button>
+    <button @click="${this.increase}" ?disabled="${this.count === this.max}">+1</button>
     </div>
 </confetti-container>
     `;
   }
 
   increase() {
-    this.count++;
+    if(this.count < this.max){
+      this.count++;
+    }
   }
 
   decrease() {
+    if(this.count > this.min){
     this.count--;
   }
-  reset() {
-    this.count = 0;
-  }
-
+}
+  
 
   /**
    * haxProperties integration via file reference
